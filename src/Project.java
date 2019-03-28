@@ -60,7 +60,7 @@ public class Project{
 	      odoThread.start();
 	      
 	      // Search related objects
-	      final FinalNavigation navigation = FinalNavigation.getNavigation(leftMotor, rightMotor, usSensorProvider, canScanner);
+	      final FinalNavigation navigation = FinalNavigation.getNavigation(leftMotor, rightMotor, usSensorProvider, canScanner,leftLightSensor, rightLightSensor);
 	      
 	      // Localization related objects
 		  
@@ -87,18 +87,23 @@ public class Project{
 				//us.localizeFallingEdge();
 				//usLocalization.fallingEdge();				
 				//lightLocalization.localization(); 
-				fullLocl.localize2();
-				//navigation.RegularTravelTo(1.5*30.48, 5.5*30.48);
+//				fullLocl.localize2();
+//				//navigation.RegularTravelTo(1.5*30.48, 5.5*30.48);
 				//navigation.travelToSearchArea();
 				//TEST GO FORWARD
-		    	leftMotor.setSpeed(100);
-			    rightMotor.setSpeed(100);
-			    leftMotor.rotate((navigation.convertDistance( 5*30.48)), true);
-		  		rightMotor.rotate((navigation.convertDistance( 5*30.48)), false);
-		    	
-				for(int i=0 ; i<5 ; i++) {
-					Sound.beep();
-				}
+//		    	leftMotor.setSpeed(100);
+//			    rightMotor.setSpeed(100);
+//			    leftMotor.rotate((navigation.convertDistance( 5*30.48)), true);
+//		  		rightMotor.rotate((navigation.convertDistance( 5*30.48)), false);
+//		    	
+//				for(int i=0 ; i<5 ; i++) {
+//					Sound.beep();
+//				}
+				navigation.RegularTravelTo(0*30.48, 1*30.48);
+				
+				navigation.RegularTravelTo(1*30.48, 1*30.48);
+				
+				navigation.RegularTravelTo(1*30.48, 2*30.48);
 				//navigation.searchRoutine();
 	        }
 	      }).start();	       
