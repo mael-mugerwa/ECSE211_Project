@@ -16,7 +16,7 @@ public class LightLocalizer extends Thread {
    * @param SENSOR_DISTANCE the distance between light sensor and center of robot
    * @param FILTER_THRESHOLD The threshold value used by the differential filter
    */
-  private static final int FORWARD_SPEED = 100;
+  private static final int FORWARD_SPEED = 99;
   private static final double SENSOR_DISTANCE = 14.5;
   private static final double FILTER_THRESHOLD = 0.08;
 

@@ -11,7 +11,7 @@ public class CanScanner  {
 	private static CanScanner canScanner = null; // Returned as singleton
 	
 	//Optimal distance to scan a can
-	final static int TARGET_DIST = 3;
+	final static int TARGET_DIST = 4;
 	//Distance to reverse before picking up can
 	final static int BACKWARD = 10;
 	//Distance need to go forward to pick up can
