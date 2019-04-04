@@ -99,12 +99,12 @@ public class Project{
 //				for(int i=0 ; i<5 ; i++) {
 //					Sound.beep();
 //				}
-				navigation.RegularTravelTo(0*30.48, 1*30.48);
-				
-				navigation.RegularTravelTo(1*30.48, 1*30.48);
-				
-				navigation.RegularTravelTo(1*30.48, 2*30.48);
-				//navigation.searchRoutine();
+//				navigation.RegularTravelTo(0*30.48, 1*30.48);
+//				
+//				navigation.RegularTravelTo(1*30.48, 1*30.48);
+//				
+//				navigation.RegularTravelTo(1*30.48, 2*30.48);
+				navigation.searchRoutine();
 	        }
 	      }).start();	       
 	      

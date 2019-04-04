@@ -13,13 +13,13 @@ public class CanScanner  {
 	//Optimal distance to scan a can
 	final static int TARGET_DIST = 3;
 	//Distance to reverse before picking up can
-	final static int BACKWARD = 10;
+	final static int BACKWARD = 15;
 	//Distance need to go forward to pick up can
-	final static int FORWARD = 13;
+	final static int FORWARD = 25;
 	
 	public static int numberOfCansCollected = 0;
 	//Motor speed when picking up cans and unloading them
-	final static int SPEED = 100;
+	final static int SPEED = 80;
 
 	private EV3LargeRegulatedMotor leftMotor;
 	private EV3LargeRegulatedMotor rightMotor;	
@@ -120,7 +120,7 @@ public class CanScanner  {
     	  ArrayList<Float> sampleG = new ArrayList<Float>(1);          
     	  ArrayList<Float> sampleB = new ArrayList<Float>(1);   
     	  
-    	  arm.setSpeed(150);
+    	  arm.setSpeed(100);
           arm.rotate(-200, true);//rotate arm
            
           while (arm.isMoving()) {
@@ -169,28 +169,28 @@ S       * @return boolean
     	  
     	  float[] ColorArray = this.scanCan3();
     	//Yellow Can average mean values for each channel 
-          //Determined by experimentation
-          float YRmi = (float)0.8560424;
-          float YGmi = (float)0.4211464;
-          float YBmi = (float)0.29550308; 
+          //Determined by experimentation April 4
+          float YRmi = (float)0.8992736;
+          float YGmi = (float)0.4085232;
+          float YBmi = (float)0.15591773; 
           
         //Blue Can average mean values for each channel 
-          //Determined by experimentation
-          float BRmi = (float)0.5742459;
-          float BGmi = (float)0.48236978;
-          float BBmi = (float)0.6516238;
+          //Determined by experimentation April 4
+          float BRmi = (float)0.42610824;
+          float BGmi = (float)0.5001118;
+          float BBmi = (float)0.75360996;
           
         //Red Can average mean values for each channel 
-          //Determined by experimentation
-          float RRmi = (float)0.9505286;
-          float RGmi = (float)0.1434068;
-          float RBmi = (float)0.272362; 
+          //Determined by experimentation April 4
+          float RRmi = (float)0.9882263;
+          float RGmi = (float)0.115791604;
+          float RBmi = (float)0.09999123; 
           
         //Green Can average mean values for each channel 
-          //Determined by experimentation
-          float GRmi = (float)0.634494;
-          float GGmi = (float)0.5799018;
-          float GBmi = (float)0.50631493;
+          //Determined by experimentation April 4
+          float GRmi = (float)0.43880418;
+          float GGmi = (float)0.6716486;
+          float GBmi = (float)0.5968949;
                    
           //Sample Can mean values
           float SRmi = ColorArray[0];
@@ -236,13 +236,14 @@ S       * @return boolean
           
     	  if(index+1 == Wifi.targetColor) {//The can we scanned is the can we are looking for
     		  Sound.setVolume(100);
-    		  for(int i=0; i<10; i++) {
+    		  
+    		  for(int i=0; i<10; i++) {   
     			  Sound.beep();//beep once found color
     		  }
 
-    		  //this.pickUpCan();
+    		  this.pickUpCan();
     		  pickedUp = true;//we picked up the can
-    		  //numberOfCansCollected++;
+    		  numberOfCansCollected++;
     	  }
     	  else {//can is not target color
     		  Sound.beep();//beep twice
@@ -258,6 +259,7 @@ S       * @return boolean
        */
       public void moveCanAside() {
     	      	  
+        gate.setSpeed(SPEED);
     	  //open trap door
     	  gate.rotate(-110);    	  
     	  //can has been moved aside
@@ -299,6 +301,7 @@ S       * @return boolean
     	  //reverse 
     	  backwardsSetDistance(BACKWARD, SPEED);
     		
+    	  gate.setSpeed(SPEED);
     	  //open trap door
     	  gate.rotate(-110);    	  
     	  
