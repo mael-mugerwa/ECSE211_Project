@@ -79,7 +79,7 @@ public class FinalNavigation extends Thread {
    * @param x - x position that the robot should travel to
    * @param y - y coordinate that the robot should travel to
    */
-  public void searchTravelTo(double x, double y) {
+  public void SearchTravelTo(double x, double y) {
 
     isNavigating = true;
 
@@ -113,12 +113,12 @@ public class FinalNavigation extends Thread {
       leftMotor.setSpeed(Project.FAST);
       rightMotor.setSpeed(Project.FAST);
 
-      searchGoStraight(distance, x, y);
+      SearchGoStraight(distance, x, y);
 
       // double travelDist = Math.sqrt(Math.pow(x-odometer.getX(), 2) +
       // Math.pow(y-odometer.getY(), 2));
       // if (travelDist > 3)
-      // searchGoStraight(travelDist, x , y );
+      // SearchGoStraight(travelDist, x , y );
 
       // else {
       odometer.setX(x);
@@ -140,7 +140,7 @@ public class FinalNavigation extends Thread {
    * 
    * @param distance The distance required to move
    */
-  public void searchGoStraight(double distance, double x, double y) {
+  public void SearchGoStraight(double distance, double x, double y) {
     leftMotor.setSpeed(Project.FAST);
     rightMotor.setSpeed(Project.FAST);
 
@@ -157,7 +157,7 @@ public class FinalNavigation extends Thread {
         RegularGoStraight(15);
         setSpeeds(0, 0);// stop robot
         canScanner.colorDetection();
-        searchTravelTo(x, y);// continue travelling to original destination
+        SearchTravelTo(x, y);// continue travelling to original destination
       }
     }
 
@@ -266,7 +266,7 @@ public class FinalNavigation extends Thread {
     ArrayList<double[]> waypoints = searchTrajectory();
 
     for (double[] point : waypoints) { // for each point in double array waypoint
-      searchTravelTo(point[0] * Project.TILE, point[1] * Project.TILE);
+      SearchTravelTo(point[0] * Project.TILE, point[1] * Project.TILE);
     }
   }
 
