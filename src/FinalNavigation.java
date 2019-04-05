@@ -83,7 +83,7 @@ public class FinalNavigation extends Thread {
 
     isNavigating = true;
 
-    if (CanScanner.numberOfCansCollected <= 2) {// robot is not full use travelto implementing
+    if (CanScanner.numberOfCansCollected < 2) {// robot is not full use travelto implementing
                                                 // canScanner
 
       deltaX = x - odometer.getX();
