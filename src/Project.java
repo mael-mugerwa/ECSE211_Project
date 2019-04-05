@@ -70,11 +70,11 @@ public class Project{
 	      final FullLocalization fullLocl = new FullLocalization(leftMotor, rightMotor, usSensorProvider, leftLightSensorProvider, rightLightSensorProvider);
 
 	      // Wifi related objects
-	     // final Wifi wifi = new Wifi();
+	      final Wifi wifi = new Wifi();
 	      
 	      // Start wifi thread
-	    //  Thread wifiThread = new Thread(wifi);
-	     // wifiThread.start();
+	      Thread wifiThread = new Thread(wifi);
+	      wifiThread.start();
 	      	      
 	      //spawn a new Thread for project 
 	      (new Thread() {
@@ -85,26 +85,12 @@ public class Project{
 	      		
 //Full localization
 				//us.localizeFallingEdge();
-				//usLocalization.fallingEdge();				
-				//lightLocalization.localization(); 
-//				fullLocl.localize2();
-//				//navigation.RegularTravelTo(1.5*30.48, 5.5*30.48);
+				usLocalization.fallingEdge();				
+			//	navigation.t
+//			
 				//navigation.travelToSearchArea();
-				//TEST GO FORWARD
-//		    	leftMotor.setSpeed(100);
-//			    rightMotor.setSpeed(100);
-//			    leftMotor.rotate((navigation.convertDistance( 5*30.48)), true);
-//		  		rightMotor.rotate((navigation.convertDistance( 5*30.48)), false);
-//		    	
-//				for(int i=0 ; i<5 ; i++) {
-//					Sound.beep();
-//				}
-//				navigation.RegularTravelTo(0*30.48, 1*30.48);
-//				
-//				navigation.RegularTravelTo(1*30.48, 1*30.48);
-//				
-//				navigation.RegularTravelTo(1*30.48, 2*30.48);
-				navigation.searchRoutine();
+				
+			//	navigation.searchRoutine();
 	        }
 	      }).start();	       
 	      
