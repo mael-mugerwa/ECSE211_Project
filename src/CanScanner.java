@@ -13,9 +13,9 @@ public class CanScanner  {
 	//Optimal distance to scan a can
 	final static int TARGET_DIST = 3;
 	//Distance to reverse before picking up can
-	final static int BACKWARD = 10;
+	final static int BACKWARD = 17;
 	//Distance need to go forward to pick up can
-	final static int FORWARD = 13;
+	final static int FORWARD = 25;
 	
 	public static int numberOfCansCollected = 0;
 	//Motor speed when picking up cans and unloading them
@@ -47,7 +47,8 @@ public class CanScanner  {
 		arm.setSpeed(Project.FAST);
 		
 		this.gate = gateMotor;
-		gate.setSpeed(SPEED);
+		gate.setAcceleration(1000);
+		gate.setSpeed(75);
 		
 		this.usProvider = usSensorProvider;
 		this.usData = new float[usSensorProvider.sampleSize()];
@@ -121,7 +122,7 @@ public class CanScanner  {
     	  ArrayList<Float> sampleB = new ArrayList<Float>(1);   
     	  
     	  arm.setSpeed(150);
-          arm.rotate(-200, true);//rotate arm
+          arm.rotate(-180, true);//rotate arm
            
           while (arm.isMoving()) {
         	  //take color measurements
@@ -130,7 +131,7 @@ public class CanScanner  {
         	  sampleB.add(getB());
           }
                    
-          arm.rotate(200, true);//rotate arm back
+          arm.rotate(180, false);//rotate arm back
 
           //Calculate the sample means for each channel
           float SmeanR = getRegMean2( sampleR );
@@ -257,12 +258,11 @@ S       * @return boolean
        * This method moves can aside by opening the door, the can is moved aside and the robot can continue moving forward
        */
       public void moveCanAside() {
-    	      	  
     	  //open trap door
-    	  gate.rotate(-110);    	  
+    	  gate.rotate(-130);    	  
     	  //can has been moved aside
     	  //close trap door
-    	  gate.rotate(110); 
+    	  gate.rotate(130); 
       }
       
       
@@ -320,7 +320,7 @@ S       * @return boolean
     	  gate.rotate(-130);
     	  
     	  //reverse 
-    	  backwardsSetDistance(BACKWARD, SPEED);
+    	  backwardsSetDistance(2*BACKWARD, SPEED);
     	  
     	  //close trap door
     	  gate.rotate(130); 

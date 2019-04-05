@@ -16,14 +16,14 @@ public class Project{
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	
 	public static final EV3LargeRegulatedMotor rightMotor =
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
+			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	
 	
 	public static final EV3MediumRegulatedMotor rotatingArmMotor =
 			new EV3MediumRegulatedMotor(LocalEV3.get().getPort("C"));
 	
 	public static final EV3LargeRegulatedMotor gateMotor =
-			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
+			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	
 	public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S2);
 	public static final SampleProvider usSensorProvider= usSensor.getMode("Distance");
@@ -38,8 +38,10 @@ public class Project{
 	public static final SampleProvider leftLightSensorProvider = leftLightSensor.getMode("RGB");
 		
 	public static final double WHEEL_RAD = 2.1;
-    public static final double TRACK =15.59;
-	public static final double DIST = 17.35;
+    public static final double TRACK = 15.88;
+	public static final double DIST = 5.15;
+
+	public static final double BLACK = 0.08;
 
 	public static final int FAST = 170;
 	public static final int SLOW = 130;
@@ -64,11 +66,12 @@ public class Project{
 	      
 	      // Localization related objects
 		  
-	      final UltrasonicLocalizer usLocalization = new UltrasonicLocalizer(leftMotor, rightMotor, usSensor);
+	      //final UltrasonicLocalizer usLocalization = new UltrasonicLocalizer(leftMotor, rightMotor, usSensor);
 		  //final US us = new US( odometer,  leftMotor,  rightMotor, usSensorProvider);
 	      //final LightLocalizer lightLocalization = new LightLocalizer(leftMotor, rightMotor, rightLightSensor);   	   		
 	      final FullLocalization fullLocl = new FullLocalization(leftMotor, rightMotor, usSensorProvider, leftLightSensorProvider, rightLightSensorProvider);
-
+	      final Testing test = new Testing(leftMotor,	rightMotor,	rotatingArmMotor, gateMotor, rotatingLightSensorProvider, leftLightSensorProvider, rightLightSensorProvider, usSensorProvider);
+	      
 	      // Wifi related objects
 	     // final Wifi wifi = new Wifi();
 	      
@@ -79,26 +82,54 @@ public class Project{
 	      //spawn a new Thread for project 
 	      (new Thread() {
 			public void run() {
-				
-				
 				Sound.setVolume(100);	
-	      		
-//Full localization
+				//test.testTrack();
+				//test.testRightBlackValue();
+				//test.testLeftBlackValue();
+	      		//test.testDISTValue();
+	      		//test.testGoingStraight();
+				fullLocl.localize2();
+				odometer.setXYT(0, 0, 90);
+				test.testGoingStraight();
+	      		//test.testLeftWheelRadius();
+				
+				//canScanner.testMeans();
+//searching fixed searching 
+				//navigation.turnRight(90);
+				
+				//loop
+				//navigation.RegularGoStraight(30.48);
+				//navigation.turnLeft(90);				
+				//navigation.RegularGoStraight(4*30.48);
+				//navigation.turnRight(90);
+				//navigation.RegularGoStraight(30.48);
+				//navigation.turnRight(90);
+				//navigation.RegularGoStraight(4*30.48);
+				//navigation.turnLeft(90);
+				
+	      //Full localization
 				//us.localizeFallingEdge();
 				//usLocalization.fallingEdge();				
 				//lightLocalization.localization(); 
-				fullLocl.localize2();
-				//navigation.RegularTravelTo(1.5*30.48, 5.5*30.48);
+
+				//fullLocl.localize2();
+				//odometer.setXYT(0, 0, 90);
+//travel to bridge entrance
+				//navigation.RegularTravelTo(2.5*30.48, 5.5*30.48);
+				//navigation.RegularTravelTo(6*30.48, 5.5*30.48);
+//searching 
+				//navigation.searchRoutine();
+				//canScanner.unloadingCans();
+				//canScanner.moveCanAside();
+				//canScanner.pickUpCan();
+				//fullLocl.localize2();
+				//odometer.setXYT(4*30.48, 5*30.48, 90);
+				
 				//navigation.travelToSearchArea();
-				//TEST GO FORWARD
-		    	leftMotor.setSpeed(100);
-			    rightMotor.setSpeed(100);
-			    leftMotor.rotate((navigation.convertDistance( 5*30.48)), true);
-		  		rightMotor.rotate((navigation.convertDistance( 5*30.48)), false);
-		    	
-				for(int i=0 ; i<5 ; i++) {
+				
+				/*for(int i=0 ; i<5 ; i++) {
 					Sound.beep();
-				}
+				}*/
 				//navigation.searchRoutine();
 	        }
 	      }).start();	       

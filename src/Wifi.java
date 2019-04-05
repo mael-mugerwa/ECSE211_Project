@@ -43,10 +43,12 @@ public class Wifi implements Runnable{
   public static double startZone_UR_x;
   public static double startZone_UR_y;
   
-  public static double bridge_LL_x;
-  public static double bridge_LL_y;
-  public static double bridge_UR_x;
-  public static double bridge_UR_y;
+  public static double tunnel_LL_x;
+  public static double tunnel_LL_y;
+  public static double tunnel_UR_x;
+  public static double tunnel_UR_y;
+  
+  public static boolean tunnelIsHorizontal;
   
   public static double island_LL_x;
   public static double island_LL_y;
@@ -98,13 +100,18 @@ public class Wifi implements Runnable{
     	  startZone_UR_x = ((Long) data.get("Red_UR_x")).doubleValue();
     	  startZone_UR_y = ((Long) data.get("Red_UR_y")).doubleValue();
     	  
-        //bridge LL
-    	  bridge_LL_x = ((Long) data.get("TNR_LL_x")).doubleValue();
-          bridge_LL_y = ((Long) data.get("TNR_LL_y")).doubleValue();
-        //bridge UR
-          bridge_UR_x = ((Long) data.get("TNR_UR_x")).doubleValue();
-          bridge_UR_y = ((Long) data.get("TNR_UR_y")).doubleValue();
-    	  
+        //tunnel LL
+    	  tunnel_LL_x = ((Long) data.get("TNR_LL_x")).doubleValue();
+          tunnel_LL_y = ((Long) data.get("TNR_LL_y")).doubleValue();
+        //tunnel UR
+          tunnel_UR_x = ((Long) data.get("TNR_UR_x")).doubleValue();
+          tunnel_UR_y = ((Long) data.get("TNR_UR_y")).doubleValue();
+    	//tunnel Orientation
+          if(tunnel_UR_y - tunnel_LL_y == 1)
+        	  tunnelIsHorizontal = true;
+          else if (tunnel_UR_y - tunnel_LL_y == 2)
+        	  tunnelIsHorizontal = false;
+          
         //island LL
           island_LL_x = ((Long) data.get("Island_LL_x")).doubleValue();
           island_LL_y = ((Long) data.get("Island_LL_y")).doubleValue();
@@ -121,6 +128,7 @@ public class Wifi implements Runnable{
           
         //TargetColor B=1, G=2, Y=3, R=4
           targetColor = 1;
+                   
       }
       
       else if (((Long) data.get("GreenTeam")).intValue() == TEAM_NUMBER)  {//your team number corresponds to green team
@@ -134,13 +142,18 @@ public class Wifi implements Runnable{
     	  startZone_UR_x = ((Long) data.get("Green_UR_x")).doubleValue();
     	  startZone_UR_y = ((Long) data.get("Green_UR_y")).doubleValue();
     	  
-        //bridge LL
-    	  bridge_LL_x = ((Long) data.get("TNG_LL_x")).doubleValue();
-          bridge_LL_y = ((Long) data.get("TNG_LL_y")).doubleValue();
-        //bridge UR
-          bridge_LL_x = ((Long) data.get("TNG_UR_x")).doubleValue();
-          bridge_LL_y = ((Long) data.get("TNG_UR_y")).doubleValue();
-    	  
+        //tunnel LL
+    	  tunnel_LL_x = ((Long) data.get("TNG_LL_x")).doubleValue();
+          tunnel_LL_y = ((Long) data.get("TNG_LL_y")).doubleValue();
+        //tunnel UR
+          tunnel_LL_x = ((Long) data.get("TNG_UR_x")).doubleValue();
+          tunnel_LL_y = ((Long) data.get("TNG_UR_y")).doubleValue();
+        //tunnel Orientation
+          if(tunnel_UR_y - tunnel_LL_y == 1)
+        	  tunnelIsHorizontal = true;
+          else if (tunnel_UR_y - tunnel_LL_y == 2)
+        	  tunnelIsHorizontal = false;
+          
         //island LL
           island_LL_x = ((Long) data.get("Island_LL_x")).doubleValue();
           island_LL_y = ((Long) data.get("Island_LL_y")).doubleValue();

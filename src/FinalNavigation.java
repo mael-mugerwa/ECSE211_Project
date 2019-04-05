@@ -162,8 +162,8 @@ public class FinalNavigation extends Thread {
 	 * Makes the robot travel to the starting corner
 	 */
   public void travelBackToStartingCorner() {
-		RegularTravelTo((Wifi.bridge_LL_x+3)*30.48, (Wifi.bridge_LL_y+0.65)*30.48);//travel to bridge exit
-		RegularTravelTo((Wifi.bridge_LL_x-0.5)*30.48, (Wifi.bridge_LL_y+0.65)*30.48);//travel to bridge entrance
+		RegularTravelTo((Wifi.tunnel_LL_x+3)*30.48, (Wifi.tunnel_LL_y+0.65)*30.48);//travel to tunnel exit
+		RegularTravelTo((Wifi.tunnel_LL_x-0.5)*30.48, (Wifi.tunnel_LL_y+0.65)*30.48);//travel to tunnel entrance
 		RegularTravelTo((Wifi.startZone_LL_x+0.5)*30.48, (Wifi.startZone_LL_y+0.5)*30.48);//travel to starting corner
 		canScanner.unloadingCans();//unload cans
 	}
@@ -172,14 +172,85 @@ public class FinalNavigation extends Thread {
    * Makes the robot travel to the search area 
    */
   public void travelToSearchArea() {
-		RegularTravelTo((Wifi.bridge_LL_x-0.5)*30.48, (Wifi.bridge_LL_y+0.65)*30.48);//travel to bridge entrance
-System.out.println("traveling to bridge entrance");
-		RegularTravelTo((Wifi.bridge_LL_x+3)*30.48, (Wifi.bridge_LL_y+0.65)*30.48);//travel to bridge exit
-System.out.println("traveling to bridge exit");
+		RegularTravelTo((Wifi.tunnel_LL_x-0.5)*30.48, (Wifi.tunnel_LL_y+0.65)*30.48);//travel to tunnel entrance
+System.out.println("traveling to tunnel entrance");
+		RegularTravelTo((Wifi.tunnel_LL_x+3)*30.48, (Wifi.tunnel_LL_y+0.65)*30.48);//travel to tunnel exit
+System.out.println("traveling to tunnel exit");
 	RegularTravelTo((Wifi.searchZone_LL_x)*30.48, (Wifi.searchZone_LL_y)*30.48);//travel to search area
 System.out.println("traveling to search zone");
 
   }
+  
+  public void travelToTunnelEntrance() {
+	  if(Wifi.startingCorner == 0) {
+    	  if(Wifi.tunnelIsHorizontal) {
+    		  RegularTravelTo((Wifi.tunnel_LL_x-0.5)*30.48, (Wifi.tunnel_LL_y+0.5)*30.48);
+    	  }
+    	  else {
+    		  RegularTravelTo((Wifi.tunnel_LL_x+0.5)*30.48, (Wifi.tunnel_LL_y-0.5)*30.48);
+    	  }
+      }
+      else if(Wifi.startingCorner == 1) {
+    	  if(Wifi.tunnelIsHorizontal) {
+    		  RegularTravelTo((Wifi.tunnel_UR_x+0.5)*30.48, (Wifi.tunnel_UR_y-0.5)*30.48);
+    	  }
+    	  else {
+    		  RegularTravelTo((Wifi.tunnel_LL_x+0.5)*30.48, (Wifi.tunnel_LL_y-0.5)*30.48);
+    	  }
+      }
+      else if(Wifi.startingCorner == 2) {
+    	  if(Wifi.tunnelIsHorizontal) {
+    		  RegularTravelTo((Wifi.tunnel_UR_x+0.5)*30.48, (Wifi.tunnel_UR_y-0.5)*30.48);
+    	  }
+    	  else {
+    		  RegularTravelTo((Wifi.tunnel_UR_x+0.5)*30.48, (Wifi.tunnel_UR_y+0.5)*30.48);
+    	  }
+      }
+      else if(Wifi.startingCorner == 3) {
+    	  if(Wifi.tunnelIsHorizontal) {
+    		  RegularTravelTo((Wifi.tunnel_LL_x-0.5)*30.48, (Wifi.tunnel_LL_y+0.5)*30.48);
+    	  }
+    	  else {
+    		  RegularTravelTo((Wifi.tunnel_UR_x+0.5)*30.48, (Wifi.tunnel_UR_y+0.5)*30.48);
+    	  }
+      }
+  }
+  
+  public void travelToTunnelExit() {
+	  if(Wifi.startingCorner == 0) {
+    	  if(Wifi.tunnelIsHorizontal) {
+    		  RegularTravelTo((Wifi.tunnel_UR_x+0.5)*30.48, (Wifi.tunnel_UR_y-0.5)*30.48);
+    	  }
+    	  else {
+    		  RegularTravelTo((Wifi.tunnel_UR_x-0.5)*30.48, (Wifi.tunnel_UR_y+0.5)*30.48);
+    	  }
+      }
+      else if(Wifi.startingCorner == 1) {
+    	  if(Wifi.tunnelIsHorizontal) {
+    		  RegularTravelTo((Wifi.tunnel_LL_x-0.5)*30.48, (Wifi.tunnel_LL_y+0.5)*30.48);
+    	  }
+    	  else {
+    		  RegularTravelTo((Wifi.tunnel_UR_x-0.5)*30.48, (Wifi.tunnel_UR_y+0.5)*30.48);
+    	  }
+      }
+      else if(Wifi.startingCorner == 2) {
+    	  if(Wifi.tunnelIsHorizontal) {
+    		  RegularTravelTo((Wifi.tunnel_LL_x-0.5)*30.48, (Wifi.tunnel_LL_y+0.5)*30.48);  
+    	  }
+    	  else {
+    		  RegularTravelTo((Wifi.tunnel_LL_x+0.5)*30.48, (Wifi.tunnel_LL_y-0.5)*30.48);
+    	  }
+      }
+      else if(Wifi.startingCorner == 3) {
+    	  if(Wifi.tunnelIsHorizontal) {
+    		  RegularTravelTo((Wifi.tunnel_UR_x+0.5)*30.48, (Wifi.tunnel_UR_y-0.5)*30.48);
+    	  }
+    	  else {
+    		  RegularTravelTo((Wifi.tunnel_LL_x+0.5)*30.48, (Wifi.tunnel_LL_y-0.5)*30.48);
+    	  }
+      }
+  }
+  
 	
 	/**
 	 * Determines robot trajectory to search the area 
@@ -189,9 +260,11 @@ System.out.println("traveling to search zone");
 	 */
 	public ArrayList<double[]> searchTrajectory() {
 		//Search Area 
-	   	double[] start = {Wifi.searchZone_LL_x, Wifi.searchZone_LL_x};//starting corner
-		double[] end = {Wifi.searchZone_UR_x,Wifi.searchZone_UR_y};//end corner
-				
+	   	//double[] start = {Wifi.searchZone_LL_x, Wifi.searchZone_LL_x};//starting corner
+		//double[] end = {Wifi.searchZone_UR_x,Wifi.searchZone_UR_y};//end corner
+		double[] start = {0,0};
+		double[] end = {4,4};
+		
 		int dx = (int) (end[0] - start[0]);// dx of the Search Area, used to determine how many points we need to travel to
 		
 		int numberofPoints = dx*2+1;//total number of points to travel to

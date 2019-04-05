@@ -33,7 +33,7 @@ public class FullLocalization  {
 	private SampleProvider usProvider;
 	private float[] usData;	
 	
-	public final double BLACK =  0.13;
+	public final double BLACK =  Project.BLACK;
 	Odometer odo;
 	
 	public FullLocalization (EV3LargeRegulatedMotor leftMotor,
@@ -44,6 +44,9 @@ public class FullLocalization  {
 		
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;		
+
+		this.leftMotor.setAcceleration(3000);
+		this.rightMotor.setAcceleration(3000);
 		
 		this.leftLightProvider = leftLightProvider;
 		this.leftLightData = new float[3];	
@@ -61,25 +64,25 @@ public class FullLocalization  {
 		}
 	}
 	public void localize2() {
-		setSpeeds(150,150);
-		leftMotor.setAcceleration(3000);
-		rightMotor.setAcceleration(3000);
+		setSpeeds(75,75);
 		boolean right=false;
 		boolean left=false;
 		while(true) {
-			if(getRightRValue() < 0.13) {
+			if(getRightRValue() < BLACK) {
+				
 				rightMotor.setSpeed(0);
 				right=true;
 			}
-			if(getLeftRValue() <0.13) {
+			if(getLeftRValue() <Project.BLACK) {
+				
 				leftMotor.setSpeed(0);
 				left=true;
 			}
 			if(left && right) {
-				leftMotor.setSpeed(150);
-				rightMotor.setSpeed(150);
-				leftMotor.rotate(-(convertDistance(Project.WHEEL_RAD, 17.35)), true);
-	      		rightMotor.rotate(-(convertDistance(Project.WHEEL_RAD, 17.35)), false);
+				leftMotor.setSpeed(75);
+				rightMotor.setSpeed(75);
+				leftMotor.rotate(convertDistance(Project.WHEEL_RAD, Project.DIST), true);
+	      		rightMotor.rotate(convertDistance(Project.WHEEL_RAD, Project.DIST), false);
 	        	setSpeeds(0, 0);
 	        	left= false;
 	        	right = false;
@@ -88,36 +91,38 @@ public class FullLocalization  {
 		}
 		
 		//turn right
-			leftMotor.setSpeed(150);
-			rightMotor.setSpeed(150);
+			leftMotor.setSpeed(75);
+			rightMotor.setSpeed(75);
 			leftMotor.rotate(convertAngle(Project.WHEEL_RAD, Project.TRACK, 90), true);
 			rightMotor.rotate(-convertAngle(Project.WHEEL_RAD, Project.TRACK, 90), false);	
 
 			
-			setSpeeds(150,150);
+			setSpeeds(75,75);
 			right=false;
 			left=false;
 			while(true) {
-				if(getRightRValue() < 0.13) {
+				if(getRightRValue() < Project.BLACK) {
+					
 					rightMotor.setSpeed(0);
 					right=true;
 				}
-				if(getLeftRValue() <0.13) {
+				if(getLeftRValue() <Project.BLACK) {
+					
 					leftMotor.setSpeed(0);
 					left=true;
 				}
 				if(left && right) {
-					leftMotor.setSpeed(150);
-					rightMotor.setSpeed(150);
-					leftMotor.rotate(-(convertDistance(Project.WHEEL_RAD, 17.35)), true);
-		      		rightMotor.rotate(-(convertDistance(Project.WHEEL_RAD, 17.35)), false);
+					leftMotor.setSpeed(75);
+					rightMotor.setSpeed(75);
+					leftMotor.rotate(convertDistance(Project.WHEEL_RAD, Project.DIST), true);
+		      		rightMotor.rotate(convertDistance(Project.WHEEL_RAD, Project.DIST), false);
 		        	setSpeeds(0, 0);
 		        	left= false;
 		        	right = false;
 		        	break;
 				}
 			}
-		odo.setXYT(30.48, 30.48, 90);
+		//odo.setXYT(30.48, 30.48, 90);
 	}
 	public float getRightRValue() {
 		rightLightProvider.fetchSample(rightLightData, 0); // acquire data
@@ -130,7 +135,7 @@ public class FullLocalization  {
 	public void localize() {
 		
 		//not facing wall
-		setSpeeds(150,150);
+		setSpeeds(75,75);
 		System.out.println("going forward");
 		while (true) {
 			if(leftLightData[0] < BLACK) {
@@ -173,7 +178,7 @@ public class FullLocalization  {
 		}
 		
 		//else go forward
-		setSpeeds(150,150);
+		setSpeeds(75,75);
 		while (true) {
 			if(leftLightData[0] < BLACK) {
 				leftMotor.setSpeed(0);
@@ -235,7 +240,7 @@ public class FullLocalization  {
 				}
 				break;
 			}
-			setSpeeds(150,150);
+			setSpeeds(75,75);
 		}
 	}
       
