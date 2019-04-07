@@ -58,7 +58,6 @@ public class FinalNavigation extends Thread {
     this.rightMotor.setAcceleration(3000);
     this.colorSensor1 = colorSensor1;
     this.colorSensor2 = colorSensor2;
-
     this.canScanner = canScanner;
     this.usSensorProvider = usSensorProvider;
     this.usData = new float[usSensorProvider.sampleSize()];
@@ -266,8 +265,29 @@ public class FinalNavigation extends Thread {
     ArrayList<double[]> waypoints = searchTrajectory();
 
     for (double[] point : waypoints) { // for each point in double array waypoint
-      SearchTravelTo(point[0] * Project.TILE, point[1] * Project.TILE);
-    }
+      double yZoneLowBound = 2 *Project.TILE; //size of search in y-direction 
+      double yZoneHighBound = 8* Project.TILE; 
+      
+      if (Math.abs(odometer.getY())-point[1]<1) {
+        SearchTravelTo(point[0]* Project.TILE /2, odometer.getY()); 
+       
+        if ( Math.abs(point[1]*30.84 - yZoneLowBound) > Math.abs(point[1]- yZoneHighBound)) {
+          //the robot should travel to the other side of the ground, in y-direction 
+          SearchTravelTo(odometer.getX(), yZoneLowBound); 
+        }
+        else {
+          SearchTravelTo(odometer.getX(), yZoneHighBound); 
+        }
+        
+        SearchTravelTo( point[0]* Project.TILE, odometer.getY()); 
+      }
+      else {
+        SearchTravelTo(point[0] * Project.TILE, point[1] * Project.TILE);
+
+      }
+    
+      }
+    
   }
 
   // REGULAR NAVIGATION METHODS
