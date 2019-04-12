@@ -1,4 +1,4 @@
-package ca.mcgill.esce211.Project.Odometer;
+package ca.mcgill.ecse211.Project.Odometer;
 import ca.mcgill.ecse211.Project.Project;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 

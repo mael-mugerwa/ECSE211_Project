@@ -1,12 +1,12 @@
 package ca.mcgill.ecse211.Project;
 import ca.mcgill.ecse211.Project.Localization.LightLocalization;
 import ca.mcgill.ecse211.Project.Localization.UltrasonicLocalization;
+import ca.mcgill.ecse211.Project.Odometer.Odometer;
+import ca.mcgill.ecse211.Project.Odometer.OdometerExceptions;
 import ca.mcgill.ecse211.Project.Searching.CanScanner;
 import ca.mcgill.ecse211.Project.Searching.Navigation;
 import ca.mcgill.ecse211.Project.Testing.Testing;
 import ca.mcgill.ecse211.Project.Wifi.Wifi;
-import ca.mcgill.esce211.Project.Odometer.Odometer;
-import ca.mcgill.esce211.Project.Odometer.OdometerExceptions;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;

@@ -3,10 +3,10 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.SampleProvider;
 
 import ca.mcgill.ecse211.Project.Project;
+import ca.mcgill.ecse211.Project.Odometer.Odometer;
+import ca.mcgill.ecse211.Project.Odometer.OdometerExceptions;
 import ca.mcgill.ecse211.Project.Searching.Navigation;
 import ca.mcgill.ecse211.Project.Wifi.Wifi;
-import ca.mcgill.esce211.Project.Odometer.Odometer;
-import ca.mcgill.esce211.Project.Odometer.OdometerExceptions;
 
 /**
  * This class houses all the required methods for our light localization routine

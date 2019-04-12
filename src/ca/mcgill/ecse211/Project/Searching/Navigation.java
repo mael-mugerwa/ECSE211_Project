@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import ca.mcgill.ecse211.Project.Project;
 import ca.mcgill.ecse211.Project.Localization.LightLocalization;
 import ca.mcgill.ecse211.Project.Wifi.Wifi;
-import ca.mcgill.esce211.Project.Odometer.Odometer;
-import ca.mcgill.esce211.Project.Odometer.OdometerExceptions;
+import ca.mcgill.ecse211.Project.Odometer.Odometer;
+import ca.mcgill.ecse211.Project.Odometer.OdometerExceptions;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.SampleProvider;  
 

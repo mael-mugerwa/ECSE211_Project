@@ -1,7 +1,7 @@
 package ca.mcgill.ecse211.Project.Localization;
 import ca.mcgill.ecse211.Project.Project;
-import ca.mcgill.esce211.Project.Odometer.Odometer;
-import ca.mcgill.esce211.Project.Odometer.OdometerExceptions;
+import ca.mcgill.ecse211.Project.Odometer.Odometer;
+import ca.mcgill.ecse211.Project.Odometer.OdometerExceptions;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
