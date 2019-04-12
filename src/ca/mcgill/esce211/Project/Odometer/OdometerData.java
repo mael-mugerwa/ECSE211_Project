@@ -80,7 +80,6 @@ public class OdometerData {
    * Writes the current position and orientation of the robot onto the odoData array. odoData[0] =
    * x, odoData[1] = y; odoData[2] = theta;
    * 
-   * @param position the array to store the odometer data
    * @return the odometer data.
    */
   public double[] getXYT() {

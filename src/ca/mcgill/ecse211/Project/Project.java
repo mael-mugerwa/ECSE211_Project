@@ -12,6 +12,7 @@ import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
+import lejos.hardware.motor.UnregulatedMotor;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
@@ -28,34 +29,62 @@ import lejos.robotics.SampleProvider;
  */
 public class Project{
 	
-	// Motor Objects, Sensor Objects 
+	/**
+	 * left motor object
+	 */
 	public static final EV3LargeRegulatedMotor leftMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	
+	/**
+	 * right motor object
+	 */
 	public static final EV3LargeRegulatedMotor rightMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	
+	/**
+	 * rotating motor object. This is the motor that rotates the light sensor arm to scan a can
+	 */
 	public static final EV3MediumRegulatedMotor rotatingArmMotor =
 			new EV3MediumRegulatedMotor(LocalEV3.get().getPort("C"));
 	
+	/**
+	 * gate motor object. This motor opens and closes the gate when picking up cans
+	 */
 	public static final EV3LargeRegulatedMotor gateMotor =
 			new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	
+	/**
+	 * front facing ultrasonic sensor object. Used for us localization and our searching routine
+	 */
 	public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S2);
 	public static final SampleProvider usProvider= usSensor.getMode("Distance");
 	
+	/**
+	 * rotating light sensor object. Used for scanning cans
+	 */
 	public static final EV3ColorSensor rotatingLightSensor = new EV3ColorSensor(SensorPort.S3);
 	public static final SampleProvider rotatingLightProvider = rotatingLightSensor.getMode("RGB");
 
+	/**
+	 * right light sensor object. Used for light localization
+	 */
 	public static final EV3ColorSensor rightLightSensor = new EV3ColorSensor(SensorPort.S1);
 	public static final SampleProvider rightLightProvider = rightLightSensor.getMode("RGB");
 
+	/**
+	 * left light sensor object. Used for light localization
+	 */
 	public static final EV3ColorSensor leftLightSensor = new EV3ColorSensor(SensorPort.S4);
 	public static final SampleProvider leftLightProvider = leftLightSensor.getMode("RGB");
 		
-	//Robot related parameters
+	/**
+	 * Wheel radius parameter
+	 */
 	public static final double WHEEL_RAD = 2.1;
-    public static final double TRACK = 15.68;
+	/**
+	 * Wheel track parameter
+	 */
+    public static final double TRACK = 16;
     /**
      * This is the distance separating the wheels from both light sensors
      */
@@ -64,94 +93,166 @@ public class Project{
 	 * This is the light sensor R reading that corresponds to a black line
 	 */
 	public static final double BLACK = 0.08;
-	public static final int FAST = 170;
-	public static final int SLOW = 130;
+	/**
+	 *  Speed parameter when going forward
+	 */
+	public static final int FORWARD_SPEED = 170;
+	/**
+	 *  Speed parameter when rotating
+	 */
+	public static final int ROTATE_SPEED = 130;
+	/**
+	 * 
+	 * Tile size parameter
+	 */
 	public static final double TILE = 30.48;
 
+
 	/**
-	 * Main method where we create our Odometer, CanScanner, Navigation, Localization objects and start the Wifi and Odometer Threads
+	 * Main method where we create our Odometer, CanScanner, Navigation, Localization, Testing objects and start the Odometer, Search Beeping and main threads
+	 * The Odometer thread runs continuously to enable the robot to always know where it is. The Search Beeping thread is used to make the robot beep once it enters the search zone.
+	 * We need this thread because when searching our robot travels to the center of the search zone. While traveling to that point the robot might pickup cans making it impossible to beep when reaching the center.
+	 * The final thread is our main thread where we call all our methods: running Wifi, Localizing, Traveling using Navigation, Searching...
 	 * @param args
 	 * @throws OdometerExceptions
 	 */
 	public static void main(String[] args) throws OdometerExceptions{
 	    
-		  // Odometer related objects
+		  /**
+		   * Odometer related objects
+		   */
 		  final Odometer odometer = Odometer.getOdometer(leftMotor, rightMotor);
 
-		  // Odometer related objects
+		  /**
+		   * CanScanner related objects
+		   */
 		  final CanScanner canScanner = CanScanner.getCanScanner(leftMotor, rightMotor, rotatingArmMotor, gateMotor, rotatingLightProvider, usProvider);
 		  
-		  // Start odometer thread
+		  /**
+		   * Start odometer thread
+		   */
 	      Thread odoThread = new Thread(odometer);
 	      odoThread.start();
 	      
-	      // Search related objects
+	      /**
+	       * Navigation related objects. This class also contains the searching method
+	       */
 	      final Navigation navigation = Navigation.getNavigation(leftMotor, rightMotor, usProvider, canScanner);
 	      
-	      // UltrasonicLocalization related objects
+	      /**
+	       *  UltrasonicLocalization related object
+	       */
 		  final UltrasonicLocalization usLocalization = new UltrasonicLocalization(leftMotor, rightMotor, usSensor);
-		  //LightLocalization related objects
+		  /**
+		   * LightLocalization related object
+		   */
 	      final LightLocalization lightLocalization = new LightLocalization(leftMotor, rightMotor, usProvider, leftLightProvider, rightLightProvider, navigation);
+	      /**
+	       * Testing related object. This class houses all our test to make testing simple
+	       */
+	      final Testing test = new Testing(leftMotor, rightMotor, rotatingArmMotor, gateMotor, rotatingLightProvider, leftLightProvider, rightLightProvider, usProvider, navigation, canScanner);
 	      
-	      final Testing test = new Testing(leftMotor,	rightMotor,	rotatingArmMotor, gateMotor, rotatingLightProvider, leftLightProvider, rightLightProvider, usProvider, navigation);
-	      
-	      // Wifi related objects
+	      /**
+	       *  Wifi related objects. This is where we parse parameters received from the server
+	       */
 	      final Wifi wifi = new Wifi();
 	      	      	      
-	      //Spawn the main Thread for our project 
+	      /**
+	       * Spawn new thread just for beeping when reaching search zone
+	       */
+	      (new Thread() {
+	    	  public void run() {
+	    		  while(true) {
+	    			  if(Wifi.searchZone_LL_x != 0.0 && Wifi.searchZone_LL_y !=0.0) {
+	    				  boolean x = ((Wifi.searchZone_LL_x*30.48 <= odometer.getX()) && (odometer.getX() <= Wifi.searchZone_UR_x*30.48 ));
+	    				  boolean y = ((Wifi.searchZone_LL_y*30.48 <= odometer.getY()) && (odometer.getY() <= Wifi.searchZone_UR_y*30.48 ));
+	    				  //System.out.println(x+" "+y);
+	    				  if(x && y) {
+		    				  for(int i=0; i<3; i++) {
+		    					  Sound.playTone(500, 500);
+		  							try {
+		  								Thread.sleep(250);
+		  							} catch (InterruptedException e) {
+		  								//do nothing
+		  							}
+		    				  }
+		    				  break;
+		    			  }
+	    			  }
+	    			 
+	    		  }
+	    		  
+	    	  }
+	      }).start();
+	      
+	      
+	      /**
+	       * Spawn the main Thread for our project. Calls methods from all our classes
+	       */
 	      (new Thread() {
 			public void run() {
 				Sound.setVolume(100);
-			
+				//run wifi				
 				wifi.run();
 				
-				usLocalization.fallingEdge();				
+				//us localization using falling edge
+				usLocalization.fallingEdge();	
+				//light localization
 				lightLocalization.localize();
 				
+				//beeping once localization is over
+				for(int i=0; i<3; i++) {
+					Sound.playTone(500, 500);
+					try {
+						Thread.sleep(250);
+					} catch (InterruptedException e) {
+						//do nothing
+					}
+				}
+				
+				//travel to tunnel entrance without using correction 
 				navigation.travelToTunnelEntrance(false);
-				lightLocalization.reLocalize();
-				odometer.setXYT(Wifi.tunnelEntrance_x*30.48, Wifi.tunnelEntrance_y*30.48, 0);
+				//relocalize before crossing tunnel
+				double angle = lightLocalization.reLocalize();
+				//correct the odometer
+				odometer.setXYT(Wifi.tunnelEntrance_x*30.48, Wifi.tunnelEntrance_y*30.48, angle);
+				//travel to tunnel exit using correction
 				navigation.travelToTunnelExit(true);
 				
+				//travel to search center
 				navigation.travelToSearchCenter();
 				
-				navigation.searchRoutine2();	
+				//search
+				navigation.searchRoutine();	
 				
+				//travel to tunnel exit without correction
 				navigation.travelToTunnelExit(false);
-				lightLocalization.reLocalize();
-				odometer.setXYT(Wifi.tunnelExit_x*30.48, Wifi.tunnelExit_y*30.48, 0);
+				
+				//2nd relocalization method
+				angle = lightLocalization.reLocalizeAgain();
+				//odometer correction
+				odometer.setXYT(Wifi.tunnelExit_x*30.48, Wifi.tunnelExit_y*30.48, angle);
+				//travel to tunnel entrance using correciton
 				navigation.travelToTunnelEntrance(true);
-
-				//Full localization
-
-				//usLocalization.fallingEdge();				
-				//lightLocalization.localize();
+				//call first relocolization method
+				angle = lightLocalization.reLocalize();
+				//odometer correction
+				odometer.setXYT(Wifi.tunnelEntrance_x*30.48, Wifi.tunnelEntrance_y*30.48, angle);
 				
-				//Travel to search area				
-				//navigation.travelToTunnelEntrance();
+				//travel to starting corner to unload cans
+				navigation.travelToStartCorner();
 				
-				//navigation.turnToFace(0);
-				//lightLocalization.localize2();
-				//navigation.travelToTunnelExit();
-				
-				//navigation.RegularTravelTo( Wifi.searchZone_LL_x*TILE, Wifi.searchZone_LL_y*TILE);
-				
-				//Searching 
-				//navigation.searchRoutine();
-				
-				//Travel to starting corner
-				//navigation.travelToTunnelExit();
-				//navigation.travelToTunnelEntrance();
-				//navigation.travelToStartCorner();
-				
-				for(int i=0 ; i<5 ; i++) {
-					Sound.beep();					
+				//final beeps
+				for(int i=0; i<5; i++) {
+					Sound.playTone(500, 500);
 					try {
-						Thread.sleep(200);
+						Thread.sleep(250);
 					} catch (InterruptedException e) {
-						//do nothing 					
-					}					
+						//do nothing
+					}
 				}
+			
+				
 	        }
 	      }).start();	       
 	      

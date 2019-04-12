@@ -16,8 +16,6 @@ import ca.mcgill.esce211.Project.Odometer.OdometerExceptions;
  */
 public class LightLocalization  {
 	
-	private static LightLocalization canScanner = null; // Returned as singleton
-	
 	/**
 	 * US distance to reach for the can to be in an optimal position to be scanned 
 	 */
@@ -31,16 +29,40 @@ public class LightLocalization  {
 	 */
 	final static int FORWARD = 13;
 
+	/**
+	 * left motor object
+	 */
 	private EV3LargeRegulatedMotor leftMotor;
+	/**
+	 * right motor object
+	 */
 	private EV3LargeRegulatedMotor rightMotor;	
 	
+	/**
+	 * left light sensor provider object
+	 */
 	private static SampleProvider leftLightProvider;
+	/**
+	 * array where left light sensor readings are stores
+	 */
 	private static float[] leftLightData;
 	
+	/**
+	 * right light sensor provider object
+	 */
 	private static SampleProvider rightLightProvider;
+	/**
+	 * array where right light sensor readings are stores
+	 */
 	private static float[] rightLightData;
 	
+	/**
+	 * odometer object
+	 */
 	Odometer odo;
+	/**
+	 * navigation object
+	 */
 	Navigation nav;
 	
 	/**
@@ -147,15 +169,21 @@ public class LightLocalization  {
 		update();//update the odometer based on starting corner
 	}
 	
-	public void reLocalize() {
-		
-		if(Wifi.tunnelIsHorizontal) 
+	/**
+	 * This method is used to relocalize only on one axis depending on the tunnel orientation.
+	 * It corrects by re aligning the robot on the opposite axis of the tunnel's orientation
+	 * @return
+	 */
+	public double reLocalize() {
+		double ang;
+		if(Wifi.tunnelIsHorizontal) {
 			nav.faceTheta(0);
-		
-		else
+			ang = 0;
+		}
+		else {
 			nav.faceTheta(90);
-		
-		//if(getDistance())//if there's a wall
+			ang = 90;
+		}
 		
 		nav.setSpeeds(75, 75);//go forward
 		//booleans to know if a line was seen on the right or the left
@@ -182,7 +210,52 @@ public class LightLocalization  {
 		       	break;
 			}
 		}		
+		return ang;
+	}
+	/**
+	 * This method is used to relocalize on both axis by facing the tunnel entrance, reversing and correcting on that axis then turning 90 degrees and doing the same to correct on the other axis.
+	 * @return
+	 */
+public double reLocalizeAgain() {
+		double ang; 
 		
+		nav.faceDestination(Wifi.tunnelEntrance_x * 30.48, Wifi.tunnelEntrance_y*30.48);
+			
+		nav.setSpeeds(-75, -75);//reverse
+		//booleans to know if a line was seen on the right or the left
+		boolean right=false;
+		boolean left=false;
+				
+		while(true) {
+			if(getRightRValue() < Project.BLACK) {	//grid line seen by right light sensor		
+				rightMotor.setSpeed(0);// stop motor
+				right=true;
+			}
+			if(getLeftRValue() <Project.BLACK) { //grid line seen by left light sensor				
+				leftMotor.setSpeed(0);//stop motor
+				left=true;
+			}
+			if(left && right) {//both light sensors picked up the grid line
+				leftMotor.setSpeed(75);
+				rightMotor.setSpeed(75);
+				//reverse to center of the tile
+				nav.RegularGoStraight(Project.DIST);
+		       	nav.setSpeeds(0, 0);
+		       	left= false;
+		       	right = false;
+		       	break;
+			}
+		}		
+		
+		if(Wifi.tunnelIsHorizontal) 
+			nav.faceTheta(0);
+
+
+		else 
+			nav.faceTheta(90);
+		
+		ang = reLocalize();
+		return ang;
 	}
 	
 	/**
@@ -204,7 +277,7 @@ public class LightLocalization  {
   }
 	
 	/**
-	 * This method sets the odometer values correctly based on starting corner 
+	 * This method sets the odometer values correctly based on starting corner. This method is used after the main localize routine
 	 */
 	public void update() {
 		if(Wifi.startingCorner == 0) 
@@ -212,9 +285,11 @@ public class LightLocalization  {
 		
 		else if (Wifi.startingCorner == 1) 
 			odo.setXYT(14*Project.TILE, 1*Project.TILE, 0);
+			//odo.setXYT(7*Project.TILE, 1*Project.TILE, 0);
 		
 		else if (Wifi.startingCorner == 2) 
 			odo.setXYT(14*Project.TILE, 8*Project.TILE, 270);
+			//odo.setXYT(14*Project.TILE, 8*Project.TILE, 270);
 		
 		else if (Wifi.startingCorner == 3) 
 			odo.setXYT(1*Project.TILE, 8*Project.TILE, 180);		

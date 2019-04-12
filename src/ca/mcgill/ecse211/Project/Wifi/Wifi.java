@@ -3,7 +3,6 @@ package ca.mcgill.ecse211.Project.Wifi;
 import java.util.Map;
 
 import ca.mcgill.ecse211.WiFiClient.WifiConnection;
-import lejos.hardware.Button;
 
 /**
  * Example class using WifiConnection to communicate with a server and receive data concerning the
@@ -32,11 +31,19 @@ import lejos.hardware.Button;
 public class Wifi implements Runnable{
 
   // ** Set these as appropriate for your team and current situation **
-  //private static final String SERVER_IP = "192.168.2.3";
+  /**
+   * Server ip to connnect to
+   */
+	private static final String SERVER_IP = "192.168.2.4";
 	
-  private static final String SERVER_IP = "192.168.2.42";	
+  /**
+   * Our team number
+   */
   private static final int TEAM_NUMBER = 13;
 
+  /**
+   * starting corner number
+   */
   public static int startingCorner;
   
   public static double startZone_LL_x;
@@ -49,11 +56,26 @@ public class Wifi implements Runnable{
   public static double tunnel_UR_x;
   public static double tunnel_UR_y;
   
+  /**
+   * Tunnel entrance is the center of the tile right before the tunnel entrance. this is this point x value
+   */
   public static double tunnelEntrance_x;
+  /**
+   * Tunnel entrance is the center of the tile right before the tunnel entrance. this is this point y value
+   */
   public static double tunnelEntrance_y;
+  /**
+   * Tunnel exit is the point exactly one tile away from the tunnel exit. This is this point x value
+   */
   public static double tunnelExit_x;
+  /**
+   * Tunnel exit is the point exactly one tile away from the tunnel exit. This is this point x value
+   */
   public static double tunnelExit_y;
   
+  /**
+   * Boolean is true if the tunnel's orientation is horizontal. False if it is vertical
+   */
   public static boolean tunnelIsHorizontal;
   
   public static double island_LL_x;
@@ -65,6 +87,7 @@ public class Wifi implements Runnable{
   public static double searchZone_LL_y;
   public static double searchZone_UR_x;
   public static double searchZone_UR_y;
+  
     
   // Enable/disable printing of debug info from the WiFi class
   private static final boolean ENABLE_DEBUG_WIFI_PRINT = true;
@@ -121,46 +144,74 @@ public class Wifi implements Runnable{
   public void getTunnelExit() {
 	  if(Wifi.startingCorner == 0) {
     	  if(Wifi.tunnelIsHorizontal) {
-    		  tunnelExit_x = (tunnel_UR_x+0.5);
+    		  //tunnelExit_x = (tunnel_UR_x+0.5);
+    		  tunnelExit_x = (tunnel_UR_x+1);
     		  tunnelExit_y = (tunnel_UR_y-0.5);
     	  }
     	  else {
     		  tunnelExit_x = (tunnel_UR_x-0.5);
-    		  tunnelExit_y = (tunnel_UR_y+0.5);
+    		  tunnelExit_y = (tunnel_UR_y+1);
+    		  //tunnelExit_y = (tunnel_UR_y+0.5);
     	  }
       }
       else if(Wifi.startingCorner == 1) {
     	  if(Wifi.tunnelIsHorizontal) {
-    		  tunnelExit_x = (tunnel_LL_x-0.5);
+    		  //tunnelExit_x = (tunnel_LL_x-0.5);
+    		  tunnelExit_x = (tunnel_LL_x-1);
     		  tunnelExit_y = (tunnel_LL_y+0.5);
     	  }
     	  else {
     		  tunnelExit_x = (tunnel_UR_x-0.5);
-    		  tunnelExit_y = (tunnel_UR_y+0.5);
+    		  tunnelExit_y = (tunnel_UR_y+1);
+    		  //tunnelExit_y = (tunnel_UR_y+0.5);
     	  }
       }
       else if(Wifi.startingCorner == 2) {
     	  if(Wifi.tunnelIsHorizontal) {
-    		  tunnelExit_x = (tunnel_LL_x-0.5);
+    		  //tunnelExit_x = (tunnel_LL_x-0.5);
+    		  tunnelExit_x = (tunnel_LL_x-1);
     		  tunnelExit_y = (tunnel_LL_y+0.5);  
     	  }
     	  else {
     		  tunnelExit_x = (tunnel_LL_x+0.5);
-    		  tunnelExit_y = (tunnel_LL_y-0.5);
+    		  tunnelExit_y = (tunnel_LL_y-1);
+    		  //tunnelExit_y = (tunnel_LL_y-0.5);
     	  }
       }
       else if(Wifi.startingCorner == 3) {
     	  if(Wifi.tunnelIsHorizontal) {
-    		  tunnelExit_x = (tunnel_UR_x+0.5);
+    		  //tunnelExit_x = (tunnel_UR_x+0.5);
+    		  tunnelExit_x = (tunnel_UR_x+1);
     		  tunnelExit_y = (tunnel_UR_y-0.5);
     	  }
     	  else {
     		  tunnelExit_x = (tunnel_LL_x+0.5);
-    		  tunnelExit_y = (tunnel_LL_y-0.5);
+    		  tunnelExit_y = (tunnel_LL_y-1);
+    		  //tunnelExit_y = (tunnel_LL_y-0.5);
     	  }
       }
   }
   
+  /**
+   * This method is to make sure the robot doesn't make contact with the wall while searching 
+   * by reducing the search zone if it s close to a wall 
+   */
+  public void edgeCases() {
+	  if(Wifi.searchZone_LL_x == 0)
+		  Wifi.searchZone_LL_x++;
+	  if(Wifi.searchZone_LL_y == 0)
+		  Wifi.searchZone_LL_y++;
+	  
+	  if(Wifi.searchZone_UR_x == 15)
+		  Wifi.searchZone_UR_y--;
+	  if(Wifi.searchZone_UR_y == 9)
+		  Wifi.searchZone_UR_x--;
+	  
+	  
+  }
+  /**
+   * this run method connects to the server and parses the data setting all the Wifi class parameters are correctly set. These parameters will be called by the methods from the rest of the classes
+   */
   @SuppressWarnings("rawtypes")
   public void run(){
     System.out.println("Running..");
@@ -228,6 +279,9 @@ public class Wifi implements Runnable{
           searchZone_UR_x = ((Long) data.get("SZR_UR_x")).doubleValue();
           searchZone_UR_y = ((Long) data.get("SZR_UR_y")).doubleValue();
                             
+        //edge cases for the search zone
+          edgeCases();
+          
       }
       
       else if (((Long) data.get("GreenTeam")).intValue() == TEAM_NUMBER)  {//your team number corresponds to green team
@@ -272,6 +326,9 @@ public class Wifi implements Runnable{
         //searchZone UR
           searchZone_UR_x = ((Long) data.get("SZG_UR_x")).doubleValue();
           searchZone_UR_y = ((Long) data.get("SZG_UR_y")).doubleValue();
+          
+        //edge cases
+          edgeCases();
       }
       
       else {//error

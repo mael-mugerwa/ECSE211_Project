@@ -2,22 +2,44 @@ package ca.mcgill.esce211.Project.Odometer;
 import ca.mcgill.ecse211.Project.Project;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * This is our odometer class holding the run method that constantly updates the x, y and theta values for the robot based on the distance traveled by the wheels
+ * @author Mael
+ *
+ */
 public class Odometer extends OdometerData implements Runnable {
 
   private OdometerData odoData;
   private static Odometer odo = null; // Returned as singleton
 
   /**
-   * @param leftTachoOld The previous left motor tacho data
-   * @param rightTachoOld The previous right motor tacho data
+   * current left motor tacho count
    */
   private int leftMotorTachoCount;
+  /**
+   * current right motor tacho count
+   */
   private int rightMotorTachoCount;
+  /**
+   * @param leftTachoOld The previous left motor tacho data
+   */
   private int leftTachoOld;
+  /**
+   * @param rightTachoOld The previous right motor tacho data
+   */
   private int rightTachoOld;
+  /**
+   * left motor object
+   */
   private EV3LargeRegulatedMotor leftMotor;
+  /**
+   * right motor object
+   */
   private EV3LargeRegulatedMotor rightMotor;
 
+  /**
+   * the odometer updates every 5 ms
+   */
   private static final long ODOMETER_PERIOD = 5; // odometer update period in ms
 
   /**

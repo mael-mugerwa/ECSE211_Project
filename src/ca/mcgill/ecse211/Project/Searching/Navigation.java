@@ -6,13 +6,11 @@ import ca.mcgill.ecse211.Project.Localization.LightLocalization;
 import ca.mcgill.ecse211.Project.Wifi.Wifi;
 import ca.mcgill.esce211.Project.Odometer.Odometer;
 import ca.mcgill.esce211.Project.Odometer.OdometerExceptions;
-import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;  
 
 /**
- * This class allows the robot to drive to a specified set of coordinates. This was implemented using the Odometer
+ * This class allows the robot to drive to a specified set of coordinates. It's methods are used everytime the robot travels as well as when searching. This was implemented using the Odometer
  * when an object is detected by the ultrasonic sensor while travelling, the robot calls the CanScanner methods to scan the can 
  * and figure out what should be done with it.
  * @author Mael Mugerwa
@@ -21,36 +19,83 @@ import lejos.robotics.SampleProvider;
  */
 public class Navigation extends Thread {
 	
-	//Optimal distance to scan a can
+	/**
+	 * Optimal distance to scan a can
+	 */
 	final static int TARGET_DIST = 3;
+	/**
+	 * x value for the center of the search zone
+	 */
 	public static double searchCenter_x;
+	/**
+	 * x value for the center of the search zone
+	 */
 	public static double searchCenter_y;
 	
 	private static Navigation nav = null; // Returned as singleton		
 	
-	//Only for beta
+	/**
+	 * boolean to know if can is picked up
+	 */
 	public static boolean picked = false;
   /**
    * @param isNavigating a boolean variable used for keeping state of navigation
-   * @param deltaX the x displacement required
-   * @param deltaY the y displacement required
-   * @param deltaTheta the angle difference required
    */
   private boolean isNavigating;
+  /**
+   * @param deltaX the x displacement required, used for traveling
+   */
   private double deltaX;
+  /**
+   * @param deltaY the y displacement required, used for traveling
+   */
   private double deltaY;
+  /**
+   * @param theta value used to calculate detlaTheta
+   */
   private double theta;
+  /**
+   *@param deltaTheta the angle difference required, used for traveling
+   */
   private double deltaTheta;
+  /**
+   * @param distance to travel to reach destination
+   */
   private double distance;
 
+  /**
+   * odometer object
+   */
   private Odometer odometer;
+  /**
+   * can scanner object
+   */
   private CanScanner canScanner;
   
+  /**
+   * left motor object
+   */
   private EV3LargeRegulatedMotor leftMotor;
+  /**
+   * right motor object
+   */
   private EV3LargeRegulatedMotor rightMotor;
+  /**
+   * Us sensor sample provider used for searching
+   */
   public SampleProvider usSensorProvider;
+  /**
+   * Array where us sensor readings are stored, used for searching
+   */
   public float[] usData; 
 
+  /**
+   * Constructor
+   * @param leftMotor
+   * @param rightMotor
+   * @param usSensorProvider
+   * @param canScanner
+   */
   public Navigation(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, SampleProvider usSensorProvider, CanScanner canScanner ) {
     this.leftMotor = leftMotor;
     this.rightMotor = rightMotor;
@@ -109,8 +154,8 @@ public class Navigation extends Thread {
 		    
 		turnTo(deltaTheta);// turn to face destination
 
-		leftMotor.setSpeed(Project.FAST);
-		rightMotor.setSpeed(Project.FAST);
+		leftMotor.setSpeed(Project.FORWARD_SPEED);
+		rightMotor.setSpeed(Project.FORWARD_SPEED);
 		    
 		SearchGoStraight(distance, x , y ); // go straight calculated distance
 	
@@ -136,22 +181,19 @@ public class Navigation extends Thread {
    * @param distance The distance required to move
    */
   public void SearchGoStraight(double distance,double x ,double y) {
-	leftMotor.setSpeed(Project.FAST);
-	rightMotor.setSpeed(Project.FAST);
+	leftMotor.setSpeed(Project.FORWARD_SPEED);
+	rightMotor.setSpeed(Project.FORWARD_SPEED);
 
     leftMotor.rotate(convertDistance(distance), true);
     rightMotor.rotate(convertDistance(distance), true);
     
     while(leftMotor.isMoving() && rightMotor.isMoving()) {//while robot is traveling scan for a can in the way 		
     	if (getDistance() <= TARGET_DIST) { // if obstacle in the way
-			setSpeeds(0,0);//stop robot
+    		RegularGoStraight(5);
+    		setSpeeds(0,0);//stop robot
 			//for beta
 			picked = canScanner.colorDetection();
-			if(picked) {
-				Sound.setVolume(100);
-				for(int i=0; i<5; i++) 
-					Sound.beep();				
-			}
+			
 			
 			SearchTravelTo(x,y);//continue traveling to original destination
 		}		
@@ -164,20 +206,28 @@ public class Navigation extends Thread {
    */
   public void travelToStartCorner() {
 	  if(Wifi.startingCorner == 0) {
-		  System.out.println("travel to "+(Wifi.startZone_LL_x + 0.5)+" "+(Wifi.startZone_LL_y + 0.5));
-    	  RegularTravelTo((Wifi.startZone_LL_x + 0.5)*30.48, (Wifi.startZone_LL_y + 0.5)*30.48);
+		  RegularTravelTo((Wifi.startZone_LL_x + 2)*30.48, (Wifi.startZone_LL_y + 2)*30.48);
+		  canScanner.openDoor();
+    	  RegularTravelTo((Wifi.startZone_LL_x)*30.48, (Wifi.startZone_LL_y)*30.48);
       }
       else if(Wifi.startingCorner == 1) {
-    	  RegularTravelTo((Wifi.startZone_UR_x - 0.5)*30.48, (Wifi.startZone_LL_y + 0.5)*30.48);
+    	  RegularTravelTo((Wifi.startZone_UR_x - 2)*30.48, (Wifi.startZone_LL_y + 2)*30.48);
+    	  canScanner.openDoor();
+    	  RegularTravelTo((Wifi.startZone_UR_x )*30.48, (Wifi.startZone_LL_y )*30.48);
       }
       else if(Wifi.startingCorner == 2) {
-    	  RegularTravelTo((Wifi.startZone_UR_x - 0.5)*30.48, (Wifi.startZone_UR_y - 0.5)*30.48);
+    	  RegularTravelTo((Wifi.startZone_UR_x - 2)*30.48, (Wifi.startZone_UR_y - 2)*30.48);
+    	  canScanner.openDoor();
+    	  RegularTravelTo((Wifi.startZone_UR_x)*30.48, (Wifi.startZone_UR_y)*30.48);
       }
       else if(Wifi.startingCorner == 3) {
-    	  RegularTravelTo((Wifi.startZone_LL_x + 0.5)*30.48, (Wifi.startZone_UR_y - 0.5)*30.48);
+    	  RegularTravelTo((Wifi.startZone_LL_x + 2)*30.48, (Wifi.startZone_UR_y - 2)*30.48);
+    	  canScanner.openDoor();
+    	  RegularTravelTo((Wifi.startZone_LL_x)*30.48, (Wifi.startZone_UR_y)*30.48);
       }
 	  
-	  canScanner.unloadingCans();//unload cans
+	  RegularGoBack(30);
+	  
 	}
   
   /**
@@ -239,7 +289,7 @@ public class Navigation extends Thread {
   public void travelToTunnelExit(boolean applyCorrection) {
 	  if(applyCorrection) {
 		  faceDestination((Wifi.tunnelExit_x)*30.48, (Wifi.tunnelExit_y)*30.48);
-		  nav.setSpeeds(75, 75);//go forward
+		  nav.setSpeeds(150, 150);//go forward
 			//booleans to know if a line was seen on the right or the left
 			boolean right=false;
 			boolean left=false;
@@ -254,10 +304,11 @@ public class Navigation extends Thread {
 					left=true;
 				}
 				if(left && right) {//both light sensors picked up the grid line
-					leftMotor.setSpeed(75);
-					rightMotor.setSpeed(75);
+					leftMotor.setSpeed(150);
+					rightMotor.setSpeed(150);
 					//reverse to center of the tile
-					RegularTravelTo((Wifi.tunnelExit_x)*30.48, (Wifi.tunnelExit_y)*30.48);			       	left= false;
+					RegularTravelTo((Wifi.tunnelExit_x)*30.48, (Wifi.tunnelExit_y)*30.48);			       
+					left= false;
 			       	right = false;
 			       	break;
 				}
@@ -273,7 +324,7 @@ public class Navigation extends Thread {
   public void travelToTunnelEntrance(boolean applyCorrection) {
 	  if(applyCorrection) {
 		  faceDestination((Wifi.tunnelEntrance_x)*30.48, (Wifi.tunnelEntrance_y)*30.48);
-		  nav.setSpeeds(75, 75);//go forward
+		  nav.setSpeeds(150, 150);//go forward
 			//booleans to know if a line was seen on the right or the left
 			boolean right=false;
 			boolean left=false;
@@ -288,8 +339,8 @@ public class Navigation extends Thread {
 					left=true;
 				}
 				if(left && right) {//both light sensors picked up the grid line
-					leftMotor.setSpeed(75);
-					rightMotor.setSpeed(75);
+					leftMotor.setSpeed(150);
+					rightMotor.setSpeed(150);
 					//reverse to center of the tile
 					RegularTravelTo((Wifi.tunnelEntrance_x)*30.48, (Wifi.tunnelEntrance_y)*30.48);
 			       	left= false;
@@ -301,72 +352,14 @@ public class Navigation extends Thread {
 	  else
 		  RegularTravelTo((Wifi.tunnelEntrance_x)*30.48, (Wifi.tunnelEntrance_y)*30.48);
   }
-  
-	/**
-	 * Determines robot trajectory to search the area 
-	 * Returns each point to travelTo to cover the entire search area
-	 * 
-	 * @return 
-	 */
-	public ArrayList<double[]> searchTrajectory() {
-		//Search Area 
-	   	double[] start = {Wifi.searchZone_LL_x, Wifi.searchZone_LL_x};//starting corner
-		double[] end = {Wifi.searchZone_UR_x,Wifi.searchZone_UR_y};//end corner
-		
-		int dx = (int) (end[0] - start[0]);// dx of the Search Area, used to determine how many points we need to travel to
-		
-		int numberofPoints = dx*2+1;//total number of points to travel to
-				
-		ArrayList<Double> Xwaypoints = new ArrayList<Double>();//all the X values for each point we need to travel to
-				
-		for(int i=0 ; i <= numberofPoints/2; i++) {//adds correct X value for each point we need to travel to
-				Xwaypoints.add(start[0]+i);
-				Xwaypoints.add(start[0]+i);
-		}
-		   
-	    Xwaypoints.remove(0); //remove the first point which corresponds to the origin
-			
-		ArrayList<Double> Ywaypoints = new ArrayList<Double>();//all the Y values for each point we need to travel to
 
-		for(int i=1 ; i<=numberofPoints; i=i+2) { //adds correct Y value for each point we need to travel to
-			if(i%4 == 1 ) {
-				Ywaypoints.add(end[1]);//add Search_UR_Y
-				Ywaypoints.add(end[1]);
-			}
-			else {
-				Ywaypoints.add(start[1]);//add Search_LL_Y
-				Ywaypoints.add(start[1]);
-			}			
-		}
-		
-		Ywaypoints.remove(Ywaypoints.size()-1);//remove the last point which corresponds to a point of the search area
-			
-///
-			
-		ArrayList<double[]> waypoints = new ArrayList<double[]>();//ArrayList holding all the waypoints we need to travel to 
-		for (int j = 0; j < Xwaypoints.size() ; j++) {
-			double[] point = {Xwaypoints.get(j),Ywaypoints.get(j)};//setting each point appropriately
-			waypoints.add(point);
-		}
-	    	
-		return waypoints;
-	}
-	
 	/**
-	 * This is our search method.
-	 * It calls the searchTrajectory method and makes the robot travel to each point of the search area
+	 * Our search method. It's assumed the robot is at the center of the search zone. It rotates on itself scanning for cans it is facing using the us sensor.
+	 * Once a can is detected the robot travels forward until the us sensor detects it is in the optimal position to start scanning. The scanning and color detection methods from the canScanner class are called.
+	 * The robot then reverses back to the search center to continue searching if the robot is not full.
 	 */
-	public void searchRoutine() {
-
-		ArrayList<double[]> waypoints = searchTrajectory();
-		
-      for (double[] point : waypoints) { //for each point in double array waypoint
-      	SearchTravelTo(point[0]*Project.TILE,point[1]*Project.TILE);
-      }		
-	}
-	
-	public void searchRoutine2() {	
-		if (CanScanner.numberOfCansCollected < 2) {//robot is not full use travel to implementing canScanner
+	public void searchRoutine() {	
+		if (CanScanner.numberOfCansCollected < 1) {//robot is not full use travel to implementing canScanner
 			setSpeeds(-50,50);
 			
 			try {
@@ -376,13 +369,7 @@ public class Navigation extends Thread {
 			}
 			
 			while(true) {
-				//System.out.println(getDistance());
 				if(getDistance() < 25) {
-					try {
-						Thread.sleep(1000);// to make sure the robot is perfectly facing the can
-					} catch (InterruptedException e) {
-						//do nothing 
-					}
 					
 					setSpeeds(0,0);
 					break;
@@ -396,13 +383,16 @@ public class Navigation extends Thread {
 			    		setSpeeds(0,0);//stop robot
 						picked = canScanner.colorDetection();
 						reverseBacktoSearchCenter();
-						searchRoutine2();
+						searchRoutine();
 			    	}
 			 }
 		}
 		
 	}
 	
+	/**
+	 * This method makes the robot travel to the center of the search zone
+	 */
 	public void travelToSearchCenter() {
 		double dx = (Wifi.searchZone_UR_x - Wifi.searchZone_LL_x)/2;
 		double dy = (Wifi.searchZone_UR_y - Wifi.searchZone_LL_y)/2 ;
@@ -412,24 +402,16 @@ public class Navigation extends Thread {
 		SearchTravelTo( searchCenter_x , searchCenter_y );
 	}
 	
+	/**
+	 * This method makes the robot reverse back to the center of the search zone by having the robot travel backwards the distance separating it from that point
+	 * This method is used during our search routine
+	 */
 	public void reverseBacktoSearchCenter() {		
 		//distance from where the robot is to search center
 		double deltax = searchCenter_x - odometer.getX();
 		double deltay = searchCenter_y - odometer.getY();
 		distance = Math.sqrt(Math.pow(deltax, 2) + Math.pow(deltay, 2));//calculate the distance separating current point from the search center
-		System.out.println(distance);
 		RegularGoBack(distance);
-	}
-	
-	public void test() {
-		setSpeeds(-50,50);
-		while(true) {
-			System.out.println(getDistance());
-			if(getDistance() < 25) {
-				Sound.beep();
-				
-			}
-		}		
 	}
 	
 	
@@ -475,8 +457,8 @@ public class Navigation extends Thread {
     
     turnTo(deltaTheta);
 
-    leftMotor.setSpeed(Project.FAST);
-    rightMotor.setSpeed(Project.FAST);
+    leftMotor.setSpeed(Project.FORWARD_SPEED);
+    rightMotor.setSpeed(Project.FORWARD_SPEED);
     
     RegularGoStraight(distance); 
    
@@ -496,8 +478,8 @@ public class Navigation extends Thread {
    */
   public void RegularGoStraight(double distance) {
 	  
-	  leftMotor.setSpeed(100);
-	  rightMotor.setSpeed(100);
+	  leftMotor.setSpeed(150);
+	  rightMotor.setSpeed(150);
 	  leftMotor.setAcceleration(3000);
     leftMotor.rotate(convertDistance(distance), true);
     rightMotor.rotate(convertDistance(distance), false);
@@ -540,13 +522,13 @@ public void RegularGoBack(double distance) {
   
   /**
    * Makes the robot turn to deltaTheta
-   * @param deltatheta
+   * @param deltaTheta
    */
   public void turnTo (double deltaTheta) {
 
 	  double theta1 = deltaTheta; 
-    leftMotor.setSpeed(Project.SLOW);
-    rightMotor.setSpeed(Project.SLOW);
+    leftMotor.setSpeed(Project.ROTATE_SPEED);
+    rightMotor.setSpeed(Project.ROTATE_SPEED);
 
     //turn rightward if theta is greater than zero 
     if (theta1 > 0 && theta1 <= 180) {     
@@ -618,7 +600,14 @@ public void RegularGoBack(double distance) {
 			this.rightMotor.forward();
 	}
 
-	
+	/**
+	 * get current instance of navigation
+	 * @param leftMotor
+	 * @param rightMotor
+	 * @param usSensorProvider
+	 * @param canScanner
+	 * @return
+	 */
 	public synchronized static Navigation getNavigation(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, SampleProvider usSensorProvider, CanScanner canScanner) {
 		if (nav != null) { // Return existing object
 		      return nav;
